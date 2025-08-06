@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/wallet_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:618518418I}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/wallet_db}
+    user: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:618518418I}
+
+logging:
+  level:
+    web: debug
+
+server:
+  port: 7070
