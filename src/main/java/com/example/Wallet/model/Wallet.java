@@ -42,8 +42,4 @@ public class Wallet {
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
 }

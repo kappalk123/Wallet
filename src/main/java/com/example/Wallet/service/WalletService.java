@@ -1,5 +1,6 @@
 package com.example.Wallet.service;
 
+import com.example.Wallet.dto.WalletDTO;
 import com.example.Wallet.exception.NotEnoughMoneyException;
 import com.example.Wallet.exception.WalletNotFoundException;
 import com.example.Wallet.model.Wallet;
@@ -7,6 +8,9 @@ import com.example.Wallet.repository.WalletRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -45,4 +49,14 @@ public class WalletService {
                 .orElseThrow(() -> new WalletNotFoundException("Кошелёк не найден"));
     }
 
+    @Retryable(value = OptimisticLockingFailureException.class,maxAttempts = 3, backoff = @Backoff(delay = 300))
+    @Transactional
+    public Wallet updateWalletWithRetry(UUID walletId, BigDecimal amount) throws WalletNotFoundException {
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new WalletNotFoundException("Кошелёк не найден"));
+
+        wallet.setAmount(wallet.getAmount().subtract(amount));
+
+        return walletRepository.save(wallet);
+    }
 }
